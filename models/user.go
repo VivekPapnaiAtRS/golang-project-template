@@ -18,7 +18,8 @@ const ActiveUser string = "active_user"
 type WSMessageType string
 
 const (
-	WSMessageTypeChatRoom WSMessageType = "chat_room"
+	WSMessageTypeChatRoom    WSMessageType = "chat_room"
+	WSMessageTypeChatMessage WSMessageType = "chat"
 )
 
 type Message struct {
@@ -29,4 +30,14 @@ type Message struct {
 type UserContext struct {
 	ID   int    `db:"id"`
 	Name string `db:"name"`
+}
+
+type ChatMessageInfo struct {
+	Data    null.String `json:"data"`
+	UserIDs []int       `json:"userIds"`
+}
+
+type PublishMessageData struct {
+	Message       Message `json:"message"`
+	SendToUserIDs []int   `json:"userIds"`
 }

@@ -32,18 +32,18 @@ type RealtimeClient struct {
 	// Buffered channel of outbound messages.
 	send chan []byte
 
-	// userContext is the user details for which the RealtimeClient belongs to.
-	userContext *models.UserContext
-
 	// uuID is a unique identifier for differentiating each RealtimeClient
 	// connection.
 	uuID uuid.UUID
 
 	// connectionUnixNano is the unix time in nano when connection established
 	connectionUnixNano int64
+
+	//	userID to identify the user
+	userID int
 }
 
-func NewRealtimeClient(hub *RealtimeHub, conn *websocket.Conn, uc *models.UserContext) *RealtimeClient {
+func NewRealtimeClient(hub *RealtimeHub, conn *websocket.Conn, userID int) *RealtimeClient {
 	uuID, err := uuid.NewUUID()
 	if err != nil {
 		logrus.Error(err)
@@ -52,9 +52,9 @@ func NewRealtimeClient(hub *RealtimeHub, conn *websocket.Conn, uc *models.UserCo
 		hub:                hub,
 		conn:               conn,
 		send:               make(chan []byte),
-		userContext:        uc,
 		uuID:               uuID,
 		connectionUnixNano: time.Now().UnixNano(),
+		userID:             userID,
 	}
 }
 
@@ -138,6 +138,9 @@ func (c *RealtimeClient) ReadPump() {
 		}
 
 		switch message.Type {
+		case models.WSMessageTypeChatMessage:
+			c.processChatMessage(message)
+
 		default:
 			logrus.Errorf("invalid ws message type")
 		}

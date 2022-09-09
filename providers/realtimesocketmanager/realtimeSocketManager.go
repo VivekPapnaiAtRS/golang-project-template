@@ -56,13 +56,13 @@ func (h *RealtimeHub) Run() {
 			h.Stop()
 			return
 		case client := <-h.register:
-			if _, ok := h.clients[client.userContext.ID]; !ok {
-				h.clients[client.userContext.ID] = make(map[uuid.UUID]*RealtimeClient)
+			if _, ok := h.clients[client.userID]; !ok {
+				h.clients[client.userID] = make(map[uuid.UUID]*RealtimeClient)
 			}
-			h.clients[client.userContext.ID][client.uuID] = client
+			h.clients[client.userID][client.uuID] = client
 
 		case client := <-h.unregister:
-			delete(h.clients[client.userContext.ID], client.uuID)
+			delete(h.clients[client.userID], client.uuID)
 
 		case userID := <-h.getClients:
 			clients, ok := h.clients[userID]
